@@ -210,7 +210,7 @@ def clear_rows(grid, locked):   # delete the full row --> create new row --> pus
             if y < ind:
                 newKey = (x, y+inc)
                 locked[newKey] = locked.pop(key)
-
+    return inc
 
 def draw_next_shape(shape, surface):
     font = pygame.font.SysFont('comicsans', 30)
@@ -229,7 +229,7 @@ def draw_next_shape(shape, surface):
     surface.blit(label, (sx + 10, sy - 30))
 
 
-def draw_window(surface, grid):
+def draw_window(surface, grid, score=0):
     surface.fill((0,0,0))
 
     pygame.font.init()
@@ -237,6 +237,14 @@ def draw_window(surface, grid):
     label = font.render('Tetris', 1, (255,255,255))
     
     surface.blit(label, (top_left_x + play_width/2 - (label.get_width()/2), 30))
+
+    font = pygame.font.SysFont('comicsans', 30)
+    label = font.render('Score: ' + str(score), 1, (255,255,255))
+
+    sx = top_left_x + play_width + 50
+    sy = top_left_y + play_height/2 - 100
+
+    surface.blit(label, (sx + 30, sy + 160))
 
     for i in range(len(grid)):
         for j in range(len(grid[i])):
@@ -259,11 +267,19 @@ def main(win):
     clock = pygame.time.Clock()
     fall_time = 0
     fall_speed = 0.27
+    level_time = 0
+    score = 0
 
     while run:
         grid = create_grid(locked_positions)
         fall_time += clock.get_rawtime()
+        level_time += clock.get_rawtime()
         clock.tick()
+
+        if level_time/1000 > 5: # every 5 seconds increase the speed of falling block
+            level_time = 0
+            if fall_speed > 0.12:
+                fall_speed -= 0.005
 
         if fall_time/1000 > fall_speed:
             fall_time = 0
@@ -310,9 +326,9 @@ def main(win):
             current_piece = next_piece
             next_piece = get_shape()
             change_piece = False
-            clear_rows(grid, locked_positions)
+            score += clear_rows(grid, locked_positions) * 10
         
-        draw_window(win, grid)
+        draw_window(win, grid, score)
         draw_next_shape(next_piece, win)
         pygame.display.update()
         
