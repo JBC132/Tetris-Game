@@ -177,8 +177,12 @@ def check_lost(positions):
 def get_shape():
     return Piece(5, 0, random.choice(shapes))
 
-def draw_text_middle():
-    pass
+def draw_text_middle(surface, text, size, color):
+    font = pygame.font.SysFont("comicsans", size, bold=True)
+    label = font.render(text, 1, color)
+
+    surface.blit(label, (top_left_x + play_width/2 - (label.get_width()/2), top_left_y + play_height/2 - label.get_height()/2))
+
 
 def draw_grid(surface, grid):
     sx = top_left_x
@@ -290,6 +294,7 @@ def main(win):
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.display.quit()
                 run = False
             
             if event.type == pygame.KEYDOWN:
@@ -333,11 +338,25 @@ def main(win):
         pygame.display.update()
         
         if check_lost(locked_positions):
+            draw_text_middle(win, "YOU LOST", 80, (255,255,255))
+            pygame.display.update()
+            pygame.time.delay(1500)
             run = False
-    pygame.display.quit()
+    
     
 def main_menu(win):
-    main(win)
+    run = True
+    while run:
+        win.fill((0,0,0))
+        draw_text_middle(win, 'Press Any Key To Play', 60, (255,255,255))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                main(win)
+    
+    pygame.display.quit()
 
 win = pygame.display.set_mode((s_width, s_height))
 pygame.display.set_caption('Tetris')
