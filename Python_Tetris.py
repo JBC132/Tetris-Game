@@ -242,7 +242,7 @@ def update_score(nscore):
             f.write(str(nscore))
 
 def max_score():
-    with open('score.txt', 'r') as f:
+    with open('scores.txt', 'r') as f:
         lines = f.readlines()
         score = lines[0].strip()
     
